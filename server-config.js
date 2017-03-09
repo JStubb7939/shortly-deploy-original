@@ -1,5 +1,5 @@
 var express = require('express');
-var cool = require('cool-ascii-faces');
+//var cool = require('cool-ascii-faces');
 var partials = require('express-partials');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
@@ -38,6 +38,6 @@ app.post('/signup', handler.signupUser);
 
 app.get('/*', handler.navToLink);
 
-app.get('/cool', util.checkUser, handler.sendCool);
+//app.get('/cool', util.checkUser, handler.sendCool);
 
 module.exports = app;
