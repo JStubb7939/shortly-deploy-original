@@ -3,7 +3,14 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     concat: {
-    },
+      options: {
+        separator: ';',
+      },
+      dist: {
+        src: ['public/**/*.js'],
+        dest: 'public/dist/app-concat.js',
+      },
+  },
 
     mochaTest: {
       test: {
@@ -20,27 +27,39 @@ module.exports = function(grunt) {
       }
     },
 
-    uglify: {
-    },
+  uglify: {
+    my_target: {
+      files: {
+        'public/dist/app-min.js': ['public/dist/app-concat.js']
+      }
+    }
+  },
 
     eslint: {
       target: [
-        // Add list of files to lint here
+        'public/client/**/*.js',
+        'public/lib/**/*.js'
       ]
     },
 
     cssmin: {
+      target: {
+        files: {
+          'public/dist/style-min.css': ['public/style.css']
+        }
+      }
     },
 
     watch: {
       scripts: {
         files: [
           'public/client/**/*.js',
-          'public/lib/**/*.js',
+          'public/lib/**/*.js'
         ],
         tasks: [
           'concat',
-          'uglify'
+          'uglify',
+          'eslint'
         ]
       },
       css: {
@@ -51,6 +70,12 @@ module.exports = function(grunt) {
 
     shell: {
       prodServer: {
+        command: 'git push live master',
+        options: {
+          stdout: true,
+          stderr: true,
+          failOnError: true
+        }
       }
     },
   });
@@ -77,19 +102,24 @@ module.exports = function(grunt) {
   ]);
 
   grunt.registerTask('build', [
+    'eslint',
+    'mochaTest',
+    'cssmin',
+    'concat',
+    'uglify'
   ]);
 
   grunt.registerTask('upload', function(n) {
     if (grunt.option('prod')) {
-      // add your production server task here
+      grunt.task.run([ 'shell:prodServer' ]);
     } else {
       grunt.task.run([ 'server-dev' ]);
     }
   });
 
-  grunt.registerTask('deploy', [
-    // add your deploy tasks here
-  ]);
+  grunt.registerTask('deploy', function (target) {
+    grunt.task.run([ 'build', 'server-dev' ]);
+  });
 
 
 };
